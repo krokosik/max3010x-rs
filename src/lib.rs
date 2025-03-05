@@ -147,10 +147,12 @@ pub enum Error<E> {
 /// LEDs
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Led {
-    /// LED1 corresponds to Red in MAX30102
+    /// LED1 corresponds to Red in MAX30102/MAX30101/MAX30105
     Led1,
-    /// LED1 corresponds to IR in MAX30102
+    /// LED1 corresponds to IR in MAX30102/MAX30101/MAX30105
     Led2,
+    /// LED3 corresponds to Green in MAX30101/MAX30105
+    Led3,
     /// Select all available LEDs in the device
     All,
 }
@@ -160,10 +162,12 @@ pub enum Led {
 pub enum TimeSlot {
     /// Time slot is disabled
     Disabled,
-    /// LED 1 active during time slot (corresponds to Red in MAX30102)
+    /// LED 1 active during time slot (corresponds to Red in MAX30102/MAX30101/MAX30105)
     Led1,
-    /// LED 2 active during time slot (corresponds to IR in MAX30102)
+    /// LED 2 active during time slot (corresponds to IR in MAX30102/MAX30101/MAX30105)
     Led2,
+    /// LED 3 active during time slot (corresponds to Green in MAX30101/MAX30105)
+    Led3,
 }
 
 /// Sample averaging
@@ -302,6 +306,8 @@ impl Register {
     const SPO2_CONFIG: u8 = 0x0A;
     const LED1_PA: u8 = 0x0C;
     const LED2_PA: u8 = 0x0D;
+    const LED3_PA: u8 = 0x0E;
+    const LED4_PA: u8 = 0x0F;
     const SLOT_CONFIG0: u8 = 0x11;
     const TEMP_INT: u8 = 0x1F;
     const TEMP_CONFIG: u8 = 0x21;
@@ -357,6 +363,7 @@ pub mod marker {
     }
     pub mod ic {
         pub struct Max30102(());
+        pub struct Max30101(());
     }
 }
 
@@ -381,6 +388,26 @@ where
 {
     /// Create new instance of the MAX3010x device.
     pub fn new_max30102(i2c: I2C) -> Self {
+        Max3010x {
+            i2c,
+            temperature_measurement_started: false,
+            mode: Config { bits: 0 },
+            fifo_config: Config { bits: 0 },
+            spo2_config: Config { bits: 0 },
+            int_en1: Config { bits: 0 },
+            int_en2: Config { bits: 0 },
+            _ic: PhantomData,
+            _mode: PhantomData,
+        }
+    }
+}
+
+impl<I2C, E> Max3010x<I2C, marker::ic::Max30101, marker::mode::None>
+where
+    I2C: i2c::I2c<Error = E>,
+{
+    /// Create new instance of the MAX3010x device.
+    pub fn new_max30101(i2c: I2C) -> Self {
         Max3010x {
             i2c,
             temperature_measurement_started: false,

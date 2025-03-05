@@ -1,9 +1,9 @@
-//! Max30102-specific configuration methods.
+//! Max30101/Max30105-specific configuration methods.
 use crate::{marker, Error, Led, Max3010x, Register as Reg, TimeSlot};
 use core::marker::PhantomData;
 use hal::i2c;
 
-impl<I2C, E, MODE> Max3010x<I2C, marker::ic::Max30102, MODE>
+impl<I2C, E, MODE> Max3010x<I2C, marker::ic::Max30101, MODE>
 where
     I2C: i2c::I2c<Error = E>,
 {
@@ -12,7 +12,7 @@ where
     /// This changes the mode and clears the FIFO data.
     pub fn into_heart_rate(
         mut self,
-    ) -> Result<Max3010x<I2C, marker::ic::Max30102, marker::mode::HeartRate>, Error<E>> {
+    ) -> Result<Max3010x<I2C, marker::ic::Max30101, marker::mode::HeartRate>, Error<E>> {
         let mode = self.mode.with_low(0b0000_0101).with_high(0b0000_0010);
         self.change_mode(mode)?;
         self.clear_fifo()?;
@@ -35,7 +35,7 @@ where
     /// This changes the mode and clears the FIFO data.
     pub fn into_oximeter(
         mut self,
-    ) -> Result<Max3010x<I2C, marker::ic::Max30102, marker::mode::Oximeter>, Error<E>> {
+    ) -> Result<Max3010x<I2C, marker::ic::Max30101, marker::mode::Oximeter>, Error<E>> {
         let mode = self.mode.with_low(0b0000_0100).with_high(0b0000_0011);
         self.change_mode(mode)?;
         self.clear_fifo()?;
@@ -58,7 +58,7 @@ where
     /// This changes the mode and clears the FIFO data.
     pub fn into_multi_led(
         mut self,
-    ) -> Result<Max3010x<I2C, marker::ic::Max30102, marker::mode::MultiLed>, Error<E>> {
+    ) -> Result<Max3010x<I2C, marker::ic::Max30101, marker::mode::MultiLed>, Error<E>> {
         let mode = self.mode.with_high(0b0000_0111);
         self.change_mode(mode)?;
         self.clear_fifo()?;
@@ -80,17 +80,22 @@ where
     ///
     /// The amplitude value corresponds to a typical current of 0.0 mA for 0
     /// up to 51.0 mA for 255.
+    /// For green LED, there are two registers, both sourcing currents, as green requires more power.
     pub fn set_pulse_amplitude(&mut self, led: Led, amplitude: u8) -> Result<(), Error<E>> {
         match led {
             Led::Led1 => self.write_data(&[Reg::LED1_PA, amplitude]),
             Led::Led2 => self.write_data(&[Reg::LED2_PA, amplitude]),
+            Led::Led3 => {
+                self.write_data(&[Reg::LED3_PA, amplitude])?;
+                self.write_data(&[Reg::LED4_PA, amplitude])?;
+                Ok(())
+            },
             Led::All => self.write_data(&[Reg::LED1_PA, amplitude, amplitude]),
-            _ => Err(Error::InvalidArguments),
         }
     }
 }
 
-impl<I2C, E> Max3010x<I2C, marker::ic::Max30102, marker::mode::MultiLed>
+impl<I2C, E> Max3010x<I2C, marker::ic::Max30101, marker::mode::MultiLed>
 where
     I2C: i2c::I2c<Error = E>,
 {

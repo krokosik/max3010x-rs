@@ -1,7 +1,7 @@
 //! Common device configuration methods.
 use crate::{
     marker, private, AdcRange, BitFlags as BF, Config, Error, FifoAlmostFullLevelInterrupt,
-    LedPulseWidth, Max3010x, Register as Reg, SampleAveraging, SamplingRate,
+    LedPulseWidth, Max3010x, Register as Reg, SampleAveraging, SamplingRate, TimeSlot,
 };
 use hal::i2c;
 
@@ -319,6 +319,18 @@ where
         int_en1,
         PPG_RDY_INT
     );
+}
+
+#[doc(hidden)]
+impl TimeSlot {
+    pub fn get_mask(self) -> u8 {
+        match self {
+            TimeSlot::Disabled => 0,
+            TimeSlot::Led1 => 1,
+            TimeSlot::Led2 => 2,
+            TimeSlot::Led3 => 3,
+        }
+    }
 }
 
 #[cfg(test)]
