@@ -448,4 +448,5 @@ mod private {
     impl Sealed for marker::mode::MultiLed {}
 
     impl Sealed for marker::ic::Max30102 {}
+    impl Sealed for marker::ic::Max30101 {}
 }

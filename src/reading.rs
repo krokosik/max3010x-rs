@@ -23,6 +23,18 @@ impl ChannelCount<marker::ic::Max30102, marker::mode::MultiLed> for marker::mode
     const CHANNEL_COUNT: u8 = 2;
 }
 
+impl ChannelCount<marker::ic::Max30101, marker::mode::HeartRate> for marker::mode::HeartRate {
+    const CHANNEL_COUNT: u8 = 1;
+}
+
+impl ChannelCount<marker::ic::Max30101, marker::mode::Oximeter> for marker::mode::Oximeter {
+    const CHANNEL_COUNT: u8 = 2;
+}
+
+impl ChannelCount<marker::ic::Max30101, marker::mode::MultiLed> for marker::mode::MultiLed {
+    const CHANNEL_COUNT: u8 = 4;
+}
+
 impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
@@ -56,7 +68,7 @@ where
 
     fn read_samples(&mut self, sample_count: usize, output: &mut [u32]) -> Result<(), Error<E>> {
         const BYTES_PER_SAMPLE: usize = 3;
-        const MAX_CHANNEL_COUNT: usize = 2; // for max30102
+        const MAX_CHANNEL_COUNT: usize = 4; // for max30101
         const FIFO_SAMPLE_SIZE: usize = 32;
 
         let mode_channels = usize::from(MODE::CHANNEL_COUNT);
