@@ -136,11 +136,13 @@ extern crate nb;
 use core::marker::PhantomData;
 
 /// All possible errors in this crate
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error<E> {
     /// I²C bus error
-    I2C(E),
+    #[error(transparent)]
+    I2C(#[from] E),
     /// Invalid arguments provided
+    #[error("Invalid arguments provided")]
     InvalidArguments,
 }
 
