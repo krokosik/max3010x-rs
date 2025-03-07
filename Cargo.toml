@@ -15,6 +15,7 @@ documentation = "https://docs.rs/max3010x"
 [dependencies]
 embedded-hal = "1.0.0"
 nb = "1"
+rustversion = "1.0.20"
 thiserror = { version = "2.0.12", default-features = false }
 
 [dev-dependencies]

@@ -135,7 +135,9 @@ use hal::i2c;
 extern crate nb;
 use core::marker::PhantomData;
 
+
 /// All possible errors in this crate
+#[rustversion::since(1.81)]
 #[derive(Debug, thiserror::Error)]
 pub enum Error<E> {
     /// I²C bus error
@@ -143,6 +145,15 @@ pub enum Error<E> {
     I2C(#[from] E),
     /// Invalid arguments provided
     #[error("Invalid arguments provided")]
+    InvalidArguments,
+}
+
+/// All possible errors in this crate
+#[rustversion::before(1.81)]
+pub enum Error<E> {
+    /// I²C bus error
+    I2C(E),
+    /// Invalid arguments provided
     InvalidArguments,
 }
 
