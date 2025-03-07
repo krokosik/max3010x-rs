@@ -39,7 +39,6 @@ impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
     MODE: ChannelCount<IC, MODE>,
-    E: core::error::Error,
 {
     /// Reads samples from FIFO.
     ///
@@ -139,7 +138,6 @@ fn convert_sampling_rate(spo2_config: u8) -> SamplingRate {
 impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
-    E: core::error::Error,
 {
     /// Get number of samples available for reading from FIFO.
     pub fn get_available_sample_count(&mut self) -> Result<u8, Error<E>> {

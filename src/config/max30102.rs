@@ -6,7 +6,6 @@ use hal::i2c;
 impl<I2C, E, MODE> Max3010x<I2C, marker::ic::Max30102, MODE>
 where
     I2C: i2c::I2c<Error = E>,
-    E: core::error::Error,
 {
     /// Change into heart-rate mode.
     ///
@@ -94,7 +93,6 @@ where
 impl<I2C, E> Max3010x<I2C, marker::ic::Max30102, marker::mode::MultiLed>
 where
     I2C: i2c::I2c<Error = E>,
-    E: core::error::Error,
 {
     /// Configure LED time slots in Multi-LED mode
     ///

@@ -65,7 +65,6 @@ macro_rules! high_low_flag_impl {
 impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
-    E: core::error::Error,
 {
     /// Resets the FIFO read and write pointers and overflow counter to 0.
     pub fn clear_fifo(&mut self) -> Result<(), Error<E>> {
@@ -174,10 +173,10 @@ where
 #[doc(hidden)]
 pub trait ValidateSrPw: private::Sealed {
     /// Check the pulse width and sample rate combination
-    fn check<E: core::error::Error>(width: LedPulseWidth, rate: SamplingRate) -> Result<(), Error<E>>;
+    fn check<E>(width: LedPulseWidth, rate: SamplingRate) -> Result<(), Error<E>>;
 }
 
-fn check_red_only<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
+fn check_red_only<E>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
     use LedPulseWidth::*;
     use SamplingRate::*;
 
@@ -190,7 +189,7 @@ fn check_red_only<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) ->
     }
 }
 
-fn check_red_ir<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
+fn check_red_ir<E>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
     use LedPulseWidth::*;
     use SamplingRate::*;
 
@@ -206,19 +205,19 @@ fn check_red_ir<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) -> R
 }
 
 impl ValidateSrPw for marker::mode::HeartRate {
-    fn check<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
+    fn check<E>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
         check_red_only(pw, sr)
     }
 }
 
 impl ValidateSrPw for marker::mode::Oximeter {
-    fn check<E: core::error::Error>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
+    fn check<E>(pw: LedPulseWidth, sr: SamplingRate) -> Result<(), Error<E>> {
         check_red_ir(pw, sr)
     }
 }
 
 impl ValidateSrPw for marker::mode::MultiLed {
-    fn check<E: core::error::Error>(_width: LedPulseWidth, _rate: SamplingRate) -> Result<(), Error<E>> {
+    fn check<E>(_width: LedPulseWidth, _rate: SamplingRate) -> Result<(), Error<E>> {
         Ok(())
     }
 }
@@ -227,7 +226,6 @@ impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
     MODE: ValidateSrPw,
-    E: core::error::Error,
 {
     /// Configure the LED pulse width.
     ///
@@ -281,7 +279,6 @@ where
 impl<I2C, E, IC> Max3010x<I2C, IC, marker::mode::Oximeter>
 where
     I2C: i2c::I2c<Error = E>,
-    E: core::error::Error,
 {
     /// Configure analog-to-digital converter range. (Only available in Oximeter mode)
     pub fn set_adc_range(&mut self, range: AdcRange) -> Result<(), Error<E>> {
@@ -312,7 +309,6 @@ impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
     MODE: HasDataReadyInterrupt,
-    E: core::error::Error,
 {
     high_low_flag_impl!(
         enable_new_fifo_data_ready_interrupt,
