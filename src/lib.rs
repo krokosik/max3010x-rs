@@ -137,12 +137,23 @@ use core::marker::PhantomData;
 
 /// All possible errors in this crate
 #[derive(Debug)]
-pub enum Error<E> {
+pub enum Error<E: core::error::Error> {
     /// I²C bus error
     I2C(E),
     /// Invalid arguments provided
     InvalidArguments,
 }
+
+impl<E: core::error::Error> core::fmt::Display for Error<E> {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Error::I2C(e) => write!(f, "I²C error: {}", e),
+            Error::InvalidArguments => write!(f, "Invalid arguments provided"),
+        }
+    }
+}
+
+impl<E: core::error::Error> core::error::Error for Error<E> {}
 
 /// LEDs
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -425,6 +436,7 @@ where
 impl<I2C, E, IC, MODE> Max3010x<I2C, IC, MODE>
 where
     I2C: i2c::I2c<Error = E>,
+    E: core::error::Error,
 {
     /// Destroy driver instance, return I²C bus instance.
     pub fn destroy(self) -> I2C {
